@@ -37,3 +37,8 @@ Para:
     result = getconfig('/tmp/ipsetip.json')
     searchnet = getconfig('/tmp/ipsetnet.json')
 </pre>
+
+
+# Para o iptables
+
+iptables-save > iptables.save
