@@ -18,6 +18,8 @@ ipsetdata = {}
 ipsetipinfo = {}
 #Informações sobre as Redes do ipset
 ipsetnetinfo = []
+#Informações sobre as regras do iptables
+iptablesinfo = []
 
 #Exclude da expansão de rede
 #netexclude = ['192.168.209.0/24']
@@ -26,6 +28,15 @@ netexclude = []
 #Permite da expansão de rede
 #netpermit = ['10.12.222.56/29','192.168.240.0/24']
 netpermit = []
+
+
+def readiptables(iptablesfile):
+
+    with open(iptablesfile, 'r') as thefile:
+        for line in thefile:
+            #line = thefile.readline()
+            line = re.sub('[\n]','', line)
+            iptablesinfo.append(line)
 
 def addname(data,name):
     try:
@@ -50,21 +61,6 @@ def net2ip(data):
 
     return result
 
-
-#def addnet(data,name):
-#    try:
-#        if name not in ipsetnetinfo[data]['name']:
-#            ipsetnetinfo[data]['name'].append(name)
-#    except:
-#        ipsetnetinfo[data] = {}
-#        ipsetnetinfo[data]['name'] = [name]
-#        if data in netpermit and data not in netexclude:
-#            result = net2ip(data)
-#            ipsetnetinfo[data]['iplist'] = result
-#
-#        #if data == '192.168.60.0/27':
-#        #    result = net2ip(data)
-#        #    ipsetnetinfo[data]['iplist'] = result
 
 def addnet(data):
 
@@ -114,7 +110,7 @@ def readfile(ipsetfile):
 
                     #Se encontrar a /, significa que é uma rede
                     if re.search('/',value):
-                        print("Network: [%s]" %value)
+                        #print("Network: [%s]" %value)
                         addname(value,name)
                         addnet(value)
 
@@ -132,14 +128,8 @@ def writestatistic(configfile,data):
 if __name__ == "__main__":
     readfile('ipset.plain')
     writestatistic('ipsetip.json',ipsetipinfo)
-    #print(ipsetdata)
-    #print(ipsetipinfo)
-    #pp.pprint(ipsetipinfo)
-    #pp.pprint(ipsetnetinfo)
     writestatistic('ipsetnet.json',ipsetnetinfo)
-    #for info in ipsetipinfo:
-    #    print("=== IP/Port: [%s]" %info)
-    #    for name in ipsetipinfo[info]['name']:
-    #        print("Name: [%s]" %name)
-    #        #print("ipset: [%s]" %ipsetdata[name])
-    #        print("Type: [%s]" %ipsetdata[name][0]['Type'])
+
+    #Para o iptables-save
+    readiptables('iptables.save')
+    writestatistic('iptables.save.json',iptablesinfo)

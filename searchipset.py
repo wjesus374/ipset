@@ -4,7 +4,6 @@
 import readline
 import re
 import json
-
 import ipcalc
 
 class MyCompleter(object):  # Custom completer
@@ -35,19 +34,32 @@ def getconfig(configfile):
     return data
 
 
+def showrules(iptables,ipsetname):
+
+    rules = []
+    resp = ['S','s','Sim','SIM','y','Y','YES']
+
+    for rule in iptables:
+        if re.search(ipsetname,rule):
+            rules.append(rule)
+
+    if len(rules) > 1:
+        result = input("IPSET encontrado no 'iptables-save' deseja mostrar todos? [S/n] ")
+
+        if result in resp:
+            for rule in rules:
+                print(rule)
+
+
 def main():
     #Coletar dados JSON
     result = getconfig('ipsetip.json')
-    keywords = []
-    #net = []
-
     searchnet = getconfig('ipsetnet.json')
+    iptables = getconfig('iptables.save.json')
 
+    keywords = []
     for key in result:
         keywords.append(key)
-
-    #for key in searchnet:
-    #    net.append(key)
 
     #keywords = ["hello", "hi", "how are you", "goodbye", "great"]
     while True:
@@ -71,14 +83,14 @@ def main():
                 print("==== IPSET:")
                 for info in result[search]:
                     for i in result[search][info]:
+                        #Printar o nome da chave e o nome do ipset
                         print("\t %s : %s" %(info.upper(),i))
+                        showrules(iptables,i)
             except Exception as e: 
                 print("Informação não encontrada no 'ipset list' - [%s]" %e)
             
             try:
                 if re.search('[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}',search):
-                    #import ipcalc
-                    #from .ipcalc import ipcalc
                     for netip in searchnet:
                         if search in ipcalc.Network(netip):
                             print("==== Rede encontrada: [%s]" %netip)
