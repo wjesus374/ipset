@@ -12,6 +12,10 @@ Contribuição:
 Gerar um ipset list:
 * sudo ipset list -output plain -file ipset.plain
 
+Ou
+
+* sudo ipset list -output plain > ipset.plain
+
 Configurar no script *parser.py* o nome dos input e output:
 
 <pre>
